@@ -1,0 +1,61 @@
+# ОС и редакторы
+.DS_Store
+Thumbs.db
+*.log
+*.bak
+*.swp
+*~
+
+# IDE / редакторы
+.idea/
+.vscode/
+.phpstorm.meta.php
+*.sublime-*
+
+# PHP / Composer
+vendor/
+composer.phar
+
+# Node / frontend
+node_modules/
+npm-debug.log
+yarn-error.log
+dist/
+build/
+
+# Laravel / фреймворки
+.env
+storage/framework/*
+bootstrap/cache/*
+public/storage           # symlink обычно
+
+# Docker
+#docker-compose.override.yml
+#*.dockerignore.extra
+#Dockerfile.*
+#docker-volumes/
+#data/
+#mysql/
+#redis/
+#volumes/
+
+# Базы данных и кэш
+#*.sql
+#*.sqlite
+#*.sqlite3
+
+# Временные файлы тестов / логов
+tests/_output/
+tests/_support/_generated/
+.phpunit.result.cache
+
+# Ключи, сертификаты, секреты
+*.pem
+*.key
+*.crt
+id_rsa
+id_ed25519
+
+# Логи промптов (если они генерируются автоматически и не нужны в git)
+prompts-*.log
+ai-logs/
