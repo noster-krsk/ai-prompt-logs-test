@@ -1,0 +1,39 @@
+@extends('layouts.app')
+
+@section('title', 'Вход в систему')
+
+@section('content')
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Вход в систему</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/login">
+                    <input type="hidden" name="_csrf_token" value="{{ $csrfToken }}">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email"
+                               class="form-control"
+                               id="email"
+                               name="email"
+                               value="{{ $session->oldInput('email') }}"
+                               required
+                               autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Пароль</label>
+                        <input type="password"
+                               class="form-control"
+                               id="password"
+                               name="password"
+                               required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Войти</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

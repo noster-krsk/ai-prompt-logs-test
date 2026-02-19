@@ -60,8 +60,6 @@ services:
     networks:
       - app-network
     restart: unless-stopped
-    env_file:
-      - .env
     environment:
       - PHP_MEMORY_LIMIT=256M
       - PHP_MAX_EXECUTION_TIME=300

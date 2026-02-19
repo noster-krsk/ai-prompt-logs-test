@@ -14,7 +14,11 @@ Thumbs.db
 
 # PHP / Composer
 vendor/
+app/vendor/
 composer.phar
+
+# BladeOne cache
+app/cache/*.php
 
 # Node / frontend
 node_modules/

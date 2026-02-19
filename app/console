@@ -1,0 +1,93 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+use App\Console\MigrationRunner;
+use App\Console\SeederRunner;
+use App\Core\Database;
+use Dotenv\Dotenv;
+
+// ──────────────────────────────────────
+// Загрузка окружения
+// ──────────────────────────────────────
+
+$envPath = __DIR__;
+if (file_exists($envPath . '/.env')) {
+    $dotenv = Dotenv::createImmutable($envPath);
+    $dotenv->safeLoad();
+}
+
+// ──────────────────────────────────────
+// Подключение к БД
+// ──────────────────────────────────────
+
+try {
+    $db = new Database(
+        host: $_ENV['MYSQL_HOST'] ?? getenv('MYSQL_HOST') ?: 'mysql',
+        dbname: $_ENV['MYSQL_DATABASE'] ?? getenv('MYSQL_DATABASE') ?: 'app_database',
+        username: $_ENV['MYSQL_USER'] ?? getenv('MYSQL_USER') ?: 'app_user',
+        password: $_ENV['MYSQL_PASSWORD'] ?? getenv('MYSQL_PASSWORD') ?: 'app_password',
+        port: (int) ($_ENV['MYSQL_PORT'] ?? getenv('MYSQL_PORT') ?: 3306),
+    );
+} catch (\PDOException $e) {
+    echo "\033[31mОшибка подключения к БД:\033[0m {$e->getMessage()}\n";
+    exit(1);
+}
+
+// ──────────────────────────────────────
+// Разбор команды
+// ──────────────────────────────────────
+
+$command = $argv[1] ?? null;
+$options = array_slice($argv, 2);
+$hasOption = fn(string $opt): bool => in_array($opt, $options, true);
+
+$migrationRunner = new MigrationRunner($db);
+$seederRunner = new SeederRunner($db);
+
+echo "\n";
+
+match ($command) {
+    'migrate' => (function () use ($migrationRunner) {
+        echo "\033[1mВыполнение миграций...\033[0m\n";
+        $migrationRunner->runPending();
+    })(),
+
+    'migrate:fresh' => (function () use ($migrationRunner, $seederRunner, $hasOption) {
+        echo "\033[1mПересоздание базы данных...\033[0m\n";
+        $migrationRunner->fresh();
+        if ($hasOption('--seed')) {
+            echo "\n\033[1mЗаполнение данными...\033[0m\n";
+            $seederRunner->runAll();
+        }
+    })(),
+
+    'migrate:status' => (function () use ($migrationRunner) {
+        echo "\033[1mСтатус миграций:\033[0m\n";
+        $migrationRunner->status();
+    })(),
+
+    'db:seed' => (function () use ($seederRunner) {
+        echo "\033[1mЗаполнение данными...\033[0m\n";
+        $seederRunner->runAll();
+    })(),
+
+    default => (function () use ($command) {
+        if ($command !== null) {
+            echo "\033[31mНеизвестная команда: {$command}\033[0m\n\n";
+        }
+        echo "\033[1mРемонтная служба — Консольные команды\033[0m\n\n";
+        echo "Использование: php console <команда> [опции]\n\n";
+        echo "Доступные команды:\n";
+        echo "  \033[32mmigrate\033[0m              Выполнить непримёненные миграции\n";
+        echo "  \033[32mmigrate:fresh\033[0m        Удалить все таблицы и запустить миграции заново\n";
+        echo "  \033[32mmigrate:fresh --seed\033[0m Пересоздать БД и заполнить данными\n";
+        echo "  \033[32mmigrate:status\033[0m       Показать статус миграций\n";
+        echo "  \033[32mdb:seed\033[0m              Запустить все сиды\n";
+    })(),
+};
+
+echo "\n";

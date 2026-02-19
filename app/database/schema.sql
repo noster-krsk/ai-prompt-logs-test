@@ -1,11 +1,5 @@
--- ============================================
--- Repair Service Requests — Database Schema
--- ============================================
+-- Repair Service Requests — DDL Schema
 
-SET NAMES utf8mb4;
-SET CHARACTER SET utf8mb4;
-
--- Таблица пользователей (диспетчеры и мастера)
 CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
@@ -16,7 +10,6 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Таблица заявок на ремонт
 CREATE TABLE IF NOT EXISTS repair_requests (
     id INT PRIMARY KEY AUTO_INCREMENT,
     client_name VARCHAR(255) NOT NULL,
@@ -32,7 +25,6 @@ CREATE TABLE IF NOT EXISTS repair_requests (
     CONSTRAINT fk_assigned_to FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Таблица аудит-лога (история изменений статусов)
 CREATE TABLE IF NOT EXISTS audit_log (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     request_id INT NOT NULL,
@@ -44,13 +36,3 @@ CREATE TABLE IF NOT EXISTS audit_log (
     CONSTRAINT fk_audit_request FOREIGN KEY (request_id) REFERENCES repair_requests(id) ON DELETE CASCADE,
     CONSTRAINT fk_audit_actor FOREIGN KEY (actor_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================
--- Seed Data — Демо-пользователи
--- ============================================
--- Пароль для всех: password
-
-INSERT INTO users (name, email, password, role) VALUES
-    ('Диспетчер Иванова', 'dispatcher@example.com', '$2y$10$WUyqg1kN7Y3apVBO6K4ZQOd615XKjESbrz1NpG9u83laGWVwi5JdO', 'dispatcher'),
-    ('Мастер Петров', 'master1@example.com', '$2y$10$WUyqg1kN7Y3apVBO6K4ZQOd615XKjESbrz1NpG9u83laGWVwi5JdO', 'master'),
-    ('Мастер Сидоров', 'master2@example.com', '$2y$10$WUyqg1kN7Y3apVBO6K4ZQOd615XKjESbrz1NpG9u83laGWVwi5JdO', 'master');
